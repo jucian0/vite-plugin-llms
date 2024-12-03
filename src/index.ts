@@ -1,8 +1,6 @@
-// src/index.ts
-
 import { resolve, join } from 'path';
 import { readFileSync, readdirSync, statSync } from 'fs';
-import type { Plugin } from 'vite';
+import type { Plugin, ViteDevServer } from 'vite';
 
 export interface LLMSPluginOptions {
   /**
@@ -23,9 +21,9 @@ export default function llmsRoutingPlugin(options: LLMSPluginOptions = {}): Plug
   return {
     name: 'vite-llms-routing',
     
-    configureServer(server) {
+    configureServer(server: ViteDevServer) {
       // Handle .md route requests and llms.txt in dev mode
-      server.middlewares.use(async (req, res, next) => {
+      server.middlewares.use((req, res, next) => {
         // Handle llms.txt request in root
         if (req.url === '/llms.txt') {
           const llmsTxtPath = resolve(process.cwd(), llmsDir, 'llms.txt');

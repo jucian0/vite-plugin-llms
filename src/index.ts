@@ -20,7 +20,7 @@ export default function llmsRoutingPlugin(options: LLMSPluginOptions = {}): Plug
 
   return {
     name: 'vite-llms-routing',
-    
+
     configureServer(server: ViteDevServer) {
       // Handle .md route requests and llms.txt in dev mode
       server.middlewares.use((req, res, next) => {
@@ -36,9 +36,9 @@ export default function llmsRoutingPlugin(options: LLMSPluginOptions = {}): Plug
             next();
           }
         }
-        
+
         // Handle .md routes
-        if (req.url?.endsWith('.md')) {
+        if (req.url?.endsWith('.md') || req.url?.endsWith('.mdx')) {
           const markdownPath = resolve(process.cwd(), llmsDir, req.url.slice(1));
           try {
             const content = readFileSync(markdownPath, 'utf-8');
@@ -58,7 +58,7 @@ export default function llmsRoutingPlugin(options: LLMSPluginOptions = {}): Plug
         const route = file.replace(resolve(process.cwd(), llmsDir), '').replace(/\\/g, '/');
         return route;
       });
-      
+
       console.log('\nLLMS Plugin: Available markdown routes:');
       console.log('  /llms.txt');
       markdownRoutes.forEach(route => {
@@ -75,7 +75,7 @@ export default function llmsRoutingPlugin(options: LLMSPluginOptions = {}): Plug
           fileName: 'llms.txt',
           source: readFileSync(llmsTxtPath, 'utf-8')
         });
-        
+
         // Copy all markdown files preserving directory structure
         const markdownFiles = getAllMarkdownFiles(resolve(process.cwd(), llmsDir));
         markdownRoutes = [];
@@ -83,7 +83,7 @@ export default function llmsRoutingPlugin(options: LLMSPluginOptions = {}): Plug
         for (const file of markdownFiles) {
           const relativePath = file.replace(resolve(process.cwd(), llmsDir), '').replace(/\\/g, '/');
           markdownRoutes.push(relativePath);
-          
+
           this.emitFile({
             type: 'asset',
             fileName: relativePath.slice(1),
@@ -122,7 +122,7 @@ function getAllMarkdownFiles(dir: string): string[] {
 
       if (stat.isDirectory()) {
         results = results.concat(getAllMarkdownFiles(filePath));
-      } else if (file.endsWith('.md')) {
+      } else if (file.endsWith('.md') || file.endsWith('.mdx')) {
         results.push(filePath);
       }
     }
